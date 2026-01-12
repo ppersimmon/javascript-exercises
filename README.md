@@ -41,6 +41,19 @@ You have an object. Your task is to traverse the object recursively, find all th
 Create a base Person object with name and phone properties and an introduce method. Then, create Student and Teacher objects that inherit properties and methods from Person. For the Student, add a course property and a study method; for the Teacher, add a subject property and a teach method. Implement this inheritance so that instances of Student and Teacher can access the introduce method from Person as well as their own specific methods, providing the solution in both ES5 (function constructors/prototypes) and ES6 (classes) formats.
 </details>
 
+<details>
+<summary><strong>Lesson 3: Patterns, DOM</strong></summary> 
+
+**Task 1**  
+Implement a simple "Factory" design pattern that creates objects of different types (for example, Car and Bike).
+These objects have ride() and stop() methods, the base class should be called Transport.
+
+**Task 2**  
+Write an application that implements displaying a list of characters from the Rick & Morty API and makes simple pagination. Get the list using fetch at: https://rickandmortyapi.com/api/character. Pagination is implemented with two buttons: Next and Prev. If you reach the first or last record, the corresponding button is blocked: addMessageButton.disabled = true; // Block button
+
+The current page number is displayed in the middle. It is calculated from the value of the data.info.next field. If this field is undefined, display data.info.pages (this is the last page). While loading, display the first page. While waiting for the loading, write "Loading..." on the screen.
+</details>
+
 ## Practice Overview
 <details>
 <summary><strong>Practice 1: Counter</strong></summary> 
