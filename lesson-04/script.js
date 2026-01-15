@@ -93,6 +93,7 @@ const eventListHandlers = {
 document.querySelector('body').addEventListener('click', event => {
     const targetWithEvent = event.target.closest('[data-event]');
     if (targetWithEvent) {
+        event.stopPropagation();
         const action = targetWithEvent.dataset.event;
 
         if (eventListHandlers[action]) {
