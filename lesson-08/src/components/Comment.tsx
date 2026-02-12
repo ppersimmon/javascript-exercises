@@ -18,7 +18,7 @@ interface CommentProps {
 const Comment = ({ comment, isOwner, onDelete }: CommentProps) => {
   return (
     <Box sx={{ mt: 1 }}>
-      <Paper sx={{ padding: 2, bgcolor: "#f5f5f5" }}>
+      <Paper sx={{ padding: 2, bgcolor: "#ffffff" }}>
         <Stack direction="row" spacing={2} alignItems="flex-start">
           <Avatar sx={{ bgcolor: "primary.main" }}>
             {comment.user.username[0].toUpperCase()}

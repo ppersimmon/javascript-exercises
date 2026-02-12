@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 export const usePageParam = (defaultPage = 1) => {
   const location = useLocation();

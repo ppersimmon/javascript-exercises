@@ -5,9 +5,6 @@
     "@mui/material": "^7.3.7",
     "ahooks": "^3.9.6",
     "date-fns": "^4.1.0",
-    "formik": "^2.4.9",
-    "react-router": "^7.13.0",
-    "redux-react-hook": "^4.0.3",
-    "yup": "^1.7.1"
+    "react-router": "^7.13.0"
   }
 }

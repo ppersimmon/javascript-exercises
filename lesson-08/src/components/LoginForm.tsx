@@ -36,7 +36,7 @@ const LoginForm = () => {
     try {
       const resultAction = await dispatch(loginUserThunk(values));
       if (loginUserThunk.fulfilled.match(resultAction)) {
-        navigate("/");
+        navigate("/my-profile");
       } else {
         setServerError("Invalid username or password");
       }

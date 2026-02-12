@@ -1,61 +1,24 @@
-import { useEffect, useState } from "react";
-import { useAppSelector } from "../store/hooks";
-import { Box, Toolbar, CircularProgress, Typography } from "@mui/material";
+import { useSearchParams } from "react-router";
+import { Box, Toolbar } from "@mui/material";
 import { blue } from "@mui/material/colors";
-import Post from "../components/Post";
 import ControlBar from "../components/ControlBar";
 import AppPagination from "../components/AppPagination";
-import { getEveryExhibit, deleteExhibit } from "../api/exhibitActions";
-import { ExhibitType } from "../interfaces/ExhibitType";
-import { usePageParam } from "../hooks/usePageParam";
+import { useStripePosts } from "../hooks/useStripePosts";
+import PostList from "../components/PostList";
 
 const StripePage = () => {
-  const [posts, setPosts] = useState<ExhibitType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const user = useAppSelector((state) => state.users.singleUser);
+  const [searchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page") || "1", 10);
 
-  const page = usePageParam();
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      try {
-        const response: any = await getEveryExhibit(page);
-
-        console.log("All Posts API Response:", response);
-
-        if (Array.isArray(response)) {
-          setPosts(response);
-        } else if (response.data && Array.isArray(response.data)) {
-          setPosts(response.data);
-        } else {
-          setPosts([]);
-        }
-      } catch (e) {
-        console.error(e);
-        setError("Failed to load posts");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [page]);
-
-  const handleDeletePost = async (id: number) => {
-    try {
-      await deleteExhibit(id);
-      setPosts(posts.filter((p) => p.id !== id));
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handlePostCreated = (newPost: ExhibitType) => {
-    if (page === 1) {
-      setPosts([newPost, ...posts]);
-    }
-  };
+  const {
+    posts,
+    loading,
+    error,
+    user,
+    totalPages,
+    handleDeletePost,
+    handlePostCreated,
+  } = useStripePosts(page);
 
   return (
     <Box
@@ -72,25 +35,15 @@ const StripePage = () => {
       <ControlBar onPostCreated={handlePostCreated} />
       <Toolbar />
 
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        Array.isArray(posts) &&
-        posts.map((post) => (
-          <Post
-            key={post.id}
-            post={post}
-            showDelete={user?.id === post.user.id}
-            onDelete={handleDeletePost}
-          />
-        ))
-      )}
+      <PostList
+        posts={posts}
+        loading={loading}
+        error={error}
+        onDelete={handleDeletePost}
+        currentUserId={user?.id}
+      />
 
-      {!loading && Array.isArray(posts) && posts.length === 0 && (
-        <Typography>No posts found</Typography>
-      )}
-
-      <AppPagination />
+      {!loading && !error && <AppPagination count={totalPages} />}
     </Box>
   );
 };

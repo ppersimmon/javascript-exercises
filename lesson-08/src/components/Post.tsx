@@ -13,6 +13,8 @@ import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import PostComments from "../components/PostComments";
+import { usePostComments } from "../hooks/usePostComments";
 import { useNavigate } from "react-router-dom";
 
 import Comment from "../components/Comment";
@@ -34,6 +36,7 @@ interface PostProps {
   post: ExhibitType;
   showDelete?: boolean;
   onDelete?: (id: number) => void;
+  onClick?: () => void;
 }
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
@@ -46,55 +49,16 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const Post = ({ post, showDelete = false, onDelete }: PostProps) => {
-  const navigate = useNavigate();
-  const [expanded, setExpanded] = React.useState(false);
-  const [comments, setComments] = React.useState<CommentI[]>([]);
-  const [loadingComments, setLoadingComments] = React.useState(false);
-  const [commentsCount, setCommentsCount] = React.useState(
-    post.commentCount || 0,
-  );
-  const currentUser = useAppSelector((state) => state.users.singleUser);
-
-  const handleExpandClick = async () => {
-    if (!expanded && comments.length === 0 && commentsCount > 0) {
-      setLoadingComments(true);
-      try {
-        const data: any = await fetchComments(post.id);
-        setComments(data);
-        setCommentsCount(data.length);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoadingComments(false);
-      }
-    }
-    setExpanded(!expanded);
-  };
-
-  const handleDeleteClick = () => {
-    if (onDelete) onDelete(post.id);
-  };
-
-  const handleAddComment = async (text: string) => {
-    try {
-      const newComment: any = await addComment(post.id, text);
-      setComments([...comments, newComment]);
-      setCommentsCount((prev) => prev + 1);
-    } catch (e) {
-      console.error("Failed to add comment", e);
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    try {
-      await deleteComment(post.id, commentId);
-      setComments(comments.filter((c) => c.id !== commentId));
-      setCommentsCount((prev) => prev - 1);
-    } catch (e) {
-      console.error("Failed to delete comment", e);
-    }
-  };
+const Post = ({ post, showDelete = false, onDelete, onClick }: PostProps) => {
+  const {
+    comments,
+    commentsCount,
+    loading,
+    expanded,
+    toggleExpand,
+    handleAddComment,
+    handleDeleteComment,
+  } = usePostComments(post.id, post.commentCount);
 
   return (
     <Card sx={{ width: 650, maxWidth: "100%", boxShadow: 3, borderRadius: 2 }}>
@@ -110,7 +74,7 @@ const Post = ({ post, showDelete = false, onDelete }: PostProps) => {
         }
         action={
           showDelete && (
-            <IconButton aria-label="delete post" onClick={handleDeleteClick}>
+            <IconButton onClick={() => onDelete && onDelete(post.id)}>
               <DeleteIcon />
             </IconButton>
           )
@@ -122,6 +86,7 @@ const Post = ({ post, showDelete = false, onDelete }: PostProps) => {
         image={post.imageUrl}
         alt={post.title}
         sx={{ objectFit: "cover" }}
+        onClick={onClick}
       />
 
       <CardContent>
@@ -143,7 +108,7 @@ const Post = ({ post, showDelete = false, onDelete }: PostProps) => {
           </Typography>
           <ExpandMore
             expand={expanded}
-            onClick={handleExpandClick}
+            onClick={toggleExpand}
             aria-expanded={expanded}
             aria-label="show more"
             sx={{ marginLeft: 0 }}
@@ -155,41 +120,12 @@ const Post = ({ post, showDelete = false, onDelete }: PostProps) => {
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          {currentUser ? (
-            <WriteComment onAdd={handleAddComment} />
-          ) : (
-            <Box sx={{ mb: 3, textAlign: "center" }}>
-              <Typography variant="body2" gutterBottom>
-                Log in to post a comment.
-              </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => navigate("/sign-in")}
-              >
-                Sign In
-              </Button>
-            </Box>
-          )}
-
-          {loadingComments ? (
-            <Typography>Loading comments...</Typography>
-          ) : (
-            comments.map((comment) => (
-              <Comment
-                key={comment.id}
-                comment={comment}
-                isOwner={Number(currentUser?.id) === Number(comment.user?.id)}
-                onDelete={handleDeleteComment}
-              />
-            ))
-          )}
-
-          {comments.length === 0 && !loadingComments && (
-            <Typography variant="body2" color="text.secondary" align="center">
-              No comments yet.
-            </Typography>
-          )}
+          <PostComments
+            comments={comments}
+            loading={loading}
+            onAdd={handleAddComment}
+            onDelete={handleDeleteComment}
+          />
         </CardContent>
       </Collapse>
     </Card>

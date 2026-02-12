@@ -10,6 +10,7 @@ import RegisterForm from "../components/RegisterForm";
 import { useAppDispatch } from "../store/hooks";
 import { getUserData } from "../api/userActions";
 import { setUser } from "../store/slices/userSlice";
+import SinglePostPage from "../layouts/SinglePostPage";
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +33,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<StripePage />} />
+      <Route path="/post/:id" element={<SinglePostPage />} />
       <Route
         element={
           <ProtectedRoute isAllowed={!isAuth} redirectPath="/my-profile" />

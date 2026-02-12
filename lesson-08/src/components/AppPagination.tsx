@@ -4,7 +4,11 @@ import PaginationItem from "@mui/material/PaginationItem";
 import { Box } from "@mui/material";
 import { blue } from "@mui/material/colors";
 
-const AppPagination = () => {
+interface AppPaginationProps {
+  count: number;
+}
+
+const AppPagination = ({ count }: AppPaginationProps) => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const page = parseInt(query.get("page") || "1", 10);
@@ -19,7 +23,7 @@ const AppPagination = () => {
     >
       <Pagination
         page={page}
-        count={10}
+        count={count}
         renderItem={(item) => (
           <PaginationItem
             component={Link}
