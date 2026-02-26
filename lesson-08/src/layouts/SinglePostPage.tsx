@@ -1,56 +1,26 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Box,
-  CircularProgress,
-  Button,
-  Typography,
-  Container,
-} from "@mui/material";
+import { Box, Button, Typography, Container } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { blue } from "@mui/material/colors";
 
 import Post from "../components/Post";
-import { getSingleExhibit } from "../api/exhibitActions";
-import { ExhibitType } from "../interfaces/ExhibitType";
-import { useAppSelector } from "../store/hooks";
+import Loading from "../components/Loading";
+import { useSinglePost } from "../hooks/useSinglePost";
 
 const SinglePostPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<ExhibitType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const currentUser = useAppSelector((state) => state.users.singleUser);
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const data = await getSingleExhibit(Number(id));
-        setPost(data);
-      } catch (e) {
-        console.error(e);
-        setError("Post not found or deleted");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id]);
+  const { data, loading, error, showDelete } = useSinglePost(id);
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-        <CircularProgress />
+      <Box sx={{ mt: 10 }}>
+        <Loading />
       </Box>
     );
   }
 
-  if (error || !post) {
+  if (error || !data) {
     return (
       <Box sx={{ textAlign: "center", mt: 10 }}>
         <Typography variant="h5" color="error" gutterBottom>
@@ -86,7 +56,7 @@ const SinglePostPage = () => {
           </Button>
         </Box>
 
-        <Post post={post} showDelete={currentUser?.id === post.user.id} />
+        <Post {...data} showDelete={showDelete} />
       </Container>
     </Box>
   );

@@ -1,34 +1,17 @@
 import { Routes, Route } from "react-router";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { RootState } from "../store/store";
 import HomePage from "../layouts/HomePage";
 import StripePage from "../layouts/StripePage";
-import LoginForm from "../components/LoginForm";
-import RegisterForm from "../components/RegisterForm";
-import { useAppDispatch } from "../store/hooks";
-import { getUserData } from "../api/userActions";
-import { setUser } from "../store/slices/userSlice";
+import LoginForm from "../layouts/LoginPage";
+import RegisterForm from "../layouts/RegisterPage";
 import SinglePostPage from "../layouts/SinglePostPage";
+import { UserStateType } from "../interfaces/userType";
 
 const AppRoutes = () => {
-  const dispatch = useAppDispatch();
-  const user = useSelector((state: RootState) => state.users.singleUser);
-  const isAuth = !!user || !!localStorage.getItem("token");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token && !user) {
-      getUserData()
-        .then((userData) => {
-          dispatch(setUser(userData));
-        })
-        .catch((err) => {
-          console.error("Failed to restore user session", err);
-        });
-    }
-  }, [dispatch, user]);
+  const authState = useSelector((state: RootState) => state.users.authState);
+  const isAuth = authState === UserStateType.LOGGED_IN;
 
   return (
     <Routes>

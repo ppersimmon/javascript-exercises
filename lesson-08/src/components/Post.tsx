@@ -12,28 +12,16 @@ import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+
 import PostComments from "../components/PostComments";
 import { usePostComments } from "../hooks/usePostComments";
-import { useNavigate } from "react-router-dom";
-
-import Comment from "../components/Comment";
-import WriteComment from "../components/WriteComment";
 import { ExhibitType } from "../interfaces/ExhibitType";
-import { CommentI } from "../interfaces/CommentI";
-import {
-  fetchComments,
-  addComment,
-  deleteComment,
-} from "../api/commentActions";
-import { useAppSelector } from "../store/hooks";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
 }
 
-interface PostProps {
-  post: ExhibitType;
+interface PostProps extends ExhibitType {
   showDelete?: boolean;
   onDelete?: (id: number) => void;
   onClick?: () => void;
@@ -49,7 +37,17 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const Post = ({ post, showDelete = false, onDelete, onClick }: PostProps) => {
+const Post = ({
+  id,
+  description,
+  imageUrl,
+  user,
+  createdAt,
+  commentCount,
+  showDelete = false,
+  onDelete,
+  onClick,
+}: PostProps) => {
   const {
     comments,
     commentsCount,
@@ -58,23 +56,21 @@ const Post = ({ post, showDelete = false, onDelete, onClick }: PostProps) => {
     toggleExpand,
     handleAddComment,
     handleDeleteComment,
-  } = usePostComments(post.id, post.commentCount);
+  } = usePostComments(id, commentCount);
 
   return (
     <Card sx={{ width: 650, maxWidth: "100%", boxShadow: 3, borderRadius: 2 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: "primary.main" }} aria-label="recipe">
-            {post.user?.username ? post.user.username[0].toUpperCase() : "U"}
+            {user?.username ? user.username[0].toUpperCase() : "U"}
           </Avatar>
         }
-        title={post.user?.username || "Unknown User"}
-        subheader={
-          post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""
-        }
+        title={user?.username || "Unknown User"}
+        subheader={createdAt ? new Date(createdAt).toLocaleDateString() : ""}
         action={
           showDelete && (
-            <IconButton onClick={() => onDelete && onDelete(post.id)}>
+            <IconButton onClick={() => onDelete && onDelete(id)}>
               <DeleteIcon />
             </IconButton>
           )
@@ -83,8 +79,7 @@ const Post = ({ post, showDelete = false, onDelete, onClick }: PostProps) => {
       <CardMedia
         component="img"
         height="300"
-        image={post.imageUrl}
-        alt={post.title}
+        image={imageUrl}
         sx={{ objectFit: "cover" }}
         onClick={onClick}
       />
@@ -97,7 +92,7 @@ const Post = ({ post, showDelete = false, onDelete, onClick }: PostProps) => {
             wordWrap: "break-word",
           }}
         >
-          {post.description}
+          {description}
         </Typography>
       </CardContent>
 

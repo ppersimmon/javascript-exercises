@@ -1,28 +1,32 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { AppBar, Toolbar, Box, Stack, Button } from "@mui/material";
 import { useNavigate } from "react-router";
-import NewPost from "./NewPost";
+import NewPost from "../layouts/NewPost";
 import { logout } from "../store/slices/userSlice";
+import { useAppDispatch } from "../store/hooks";
 import { RootState } from "../store/store";
+import { ExhibitType } from "../interfaces/ExhibitType";
+import { UserStateType } from "../interfaces/userType";
 
 interface ControlBarProps {
-  onPostCreated?: (post: any) => void;
+  onPostCreated?: (post: ExhibitType) => void;
 }
 
 const ControlBar = ({ onPostCreated }: ControlBarProps) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [isModalOpen, setModalOpen] = useState(false);
-  const user = useSelector((state: RootState) => state.users.singleUser);
-  const isAuth = !!user || !!localStorage.getItem("token");
+
+  const authState = useSelector((state: RootState) => state.users.authState);
+  const isAuth = authState === UserStateType.LOGGED_IN;
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
   };
 
-  const handlePostSuccess = (post: any) => {
+  const handlePostSuccess = (post: ExhibitType) => {
     if (onPostCreated) {
       onPostCreated(post);
     }

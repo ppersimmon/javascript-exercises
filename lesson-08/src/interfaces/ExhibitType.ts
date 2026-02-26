@@ -1,6 +1,5 @@
 export interface ExhibitType {
   id: number;
-  title: string;
   description: string;
   imageUrl: string;
   user: {
@@ -9,4 +8,11 @@ export interface ExhibitType {
   };
   createdAt: string;
   commentCount: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  lastPage: number;
 }

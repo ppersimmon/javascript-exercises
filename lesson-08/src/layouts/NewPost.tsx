@@ -18,6 +18,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import { postExhibit } from "../api/exhibitActions";
+import { ExhibitType } from "../interfaces/ExhibitType";
 
 interface FormValues {
   description: string;
@@ -27,7 +28,7 @@ interface FormValues {
 interface NewPostProps {
   open: boolean;
   onClose: () => void;
-  onPostCreated: (newPost: any) => void;
+  onPostCreated: (newPost: ExhibitType) => void;
 }
 
 const NewPostSchema = Yup.object().shape({

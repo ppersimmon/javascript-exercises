@@ -1,8 +1,8 @@
 import { useSearchParams } from "react-router";
-import { Box, Toolbar } from "@mui/material";
+import { Box, Toolbar, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import ControlBar from "../components/ControlBar";
-import AppPagination from "../components/AppPagination";
+import Loading from "../components/Loading";
 import { useStripePosts } from "../hooks/useStripePosts";
 import PostList from "../components/PostList";
 
@@ -10,15 +10,8 @@ const StripePage = () => {
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1", 10);
 
-  const {
-    posts,
-    loading,
-    error,
-    user,
-    totalPages,
-    handleDeletePost,
-    handlePostCreated,
-  } = useStripePosts(page);
+  const { data, loading, error, user, handleDeletePost, handlePostCreated } =
+    useStripePosts(page);
 
   return (
     <Box
@@ -35,15 +28,18 @@ const StripePage = () => {
       <ControlBar onPostCreated={handlePostCreated} />
       <Toolbar />
 
-      <PostList
-        posts={posts}
-        loading={loading}
-        error={error}
-        onDelete={handleDeletePost}
-        currentUserId={user?.id}
-      />
-
-      {!loading && !error && <AppPagination count={totalPages} />}
+      {loading && (!data?.data || data.data.length === 0) ? (
+        <Loading />
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : (
+        <PostList
+          {...data}
+          currentUserId={user?.id}
+          onDelete={handleDeletePost}
+          navigationPath="/stripe?page="
+        />
+      )}
     </Box>
   );
 };

@@ -5,32 +5,26 @@ import { Box } from "@mui/material";
 import { blue } from "@mui/material/colors";
 
 interface AppPaginationProps {
-  count: number;
+  page: number;
+  lastPage: number;
 }
 
-const AppPagination = ({ count }: AppPaginationProps) => {
+const AppPagination = ({ page, lastPage }: AppPaginationProps) => {
   const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const page = parseInt(query.get("page") || "1", 10);
 
   return (
-    <Box
-      sx={{
-        bgcolor: blue[50],
-        mt: "auto",
-        p: 4,
-      }}
-    >
+    <Box sx={{ bgcolor: blue[50], mt: "auto", p: 4 }}>
       <Pagination
-        page={page}
-        count={count}
-        renderItem={(item) => (
-          <PaginationItem
-            component={Link}
-            to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`}
-            {...item}
-          />
-        )}
+        page={Number(page)}
+        count={lastPage}
+        renderItem={(item) => {
+          const toUrl =
+            item.page === 1
+              ? location.pathname
+              : `${location.pathname}?page=${item.page}`;
+
+          return <PaginationItem component={Link} to={toUrl} {...item} />;
+        }}
       />
     </Box>
   );

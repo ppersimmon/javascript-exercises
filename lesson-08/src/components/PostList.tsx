@@ -1,43 +1,43 @@
 import { Typography } from "@mui/material";
 import Post from "./Post";
-import Loading from "./Loading";
+import AppPagination from "./AppPagination";
 import { ExhibitType } from "../interfaces/ExhibitType";
 import { useNavigate } from "react-router";
 
 interface PostListProps {
-  posts: ExhibitType[];
-  loading: boolean;
-  error: string | null;
+  data: ExhibitType[];
+  page: number;
+  lastPage: number;
+  navigationPath: string;
   onDelete: (id: number) => void;
   currentUserId?: number;
 }
 
 const PostList = ({
-  posts,
-  loading,
-  error,
+  data,
+  page,
+  lastPage,
   onDelete,
   currentUserId,
 }: PostListProps) => {
   const navigate = useNavigate();
 
-  if (loading) return <Loading />;
-  if (error) return <Typography color="error">{error}</Typography>;
-  if (!Array.isArray(posts) || posts.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return <Typography>No posts found</Typography>;
   }
 
   return (
     <>
-      {posts.map((post) => (
+      {data.map((post) => (
         <Post
           key={post.id}
-          post={post}
-          showDelete={currentUserId === post.user.id}
+          {...post}
+          showDelete={currentUserId === post?.user?.id}
           onDelete={onDelete}
           onClick={() => navigate(`/post/${post.id}`)}
         />
       ))}
+      {lastPage > 1 && <AppPagination page={page} lastPage={lastPage} />}
     </>
   );
 };
